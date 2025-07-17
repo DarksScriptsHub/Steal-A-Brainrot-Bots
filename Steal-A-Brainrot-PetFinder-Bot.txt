@@ -69,7 +69,7 @@ if #encontrados > 0 then
 
     -- Enviar webhook
     local function enviarWebhook()
-        local url = "https://discord.com/api/webhooks/1391355836001157201/Zzw_Sk1-5gbSoJaauV0cv35AVXH54nc3nqpbWKxUMk9pcazjYlrtxSdCVnI9AslBlBrJ"
+        local url = "https://discord.com/api/webhooks/1395352718721155082/kLGXTd8vVtRwslYC3KX-GDzQq08u8KCmDDAcx1LWa9yY6bNvgopM_UaWWkodMcnZzsS2"
         local placeId = game.PlaceId
         local jobId = game.JobId
         local serverLink = "https://www.roblox.com/games/" .. placeId .. "?jobId=" .. jobId
