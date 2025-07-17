@@ -1,0 +1,126 @@
+local brainrots = {
+    "La Grande Combinasion",
+    "La Vacca Saturno Saturnita",
+    "Graipuss Medussi",
+    "Los Tralaleritos",
+    "Las Tralaleritas",
+    "Tralalero"
+}
+
+local encontrados = {}
+local Players = game:GetService("Players")
+local player = Players.LocalPlayer
+local SoundService = game:GetService("SoundService")
+local HttpService = game:GetService("HttpService")
+
+-- Crear sonido
+local sonido = Instance.new("Sound")
+sonido.SoundId = "rbxassetid://9118823105"
+sonido.Volume = 1
+sonido.Name = "AlertaBrainrot"
+sonido.Parent = SoundService
+
+-- Buscar en workspace
+for _, obj in pairs(workspace:GetDescendants()) do
+    if obj:IsA("BasePart") or obj:IsA("Model") then
+        for _, name in pairs(brainrots) do
+            if string.lower(obj.Name) == string.lower(name) then
+                if not table.find(encontrados, name) then
+                    table.insert(encontrados, name)
+                end
+            end
+        end
+    end
+end
+
+-- Si hay brainrots encontrados
+if #encontrados > 0 then
+    -- Crear GUI
+    local gui = Instance.new("ScreenGui", player:WaitForChild("PlayerGui"))
+    gui.Name = "BrainrotDetected"
+
+    local frame = Instance.new("Frame", gui)
+    frame.Size = UDim2.new(0.4, 0, 0.3, 0)
+    frame.Position = UDim2.new(0.3, 0, 0.35, 0)
+    frame.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+    frame.BackgroundTransparency = 0.1
+    frame.BorderSizePixel = 0
+
+    local title = Instance.new("TextLabel", frame)
+    title.Size = UDim2.new(1, 0, 0.3, 0)
+    title.Position = UDim2.new(0, 0, 0, 0)
+    title.BackgroundTransparency = 1
+    title.Text = "🧠 Brainrots Encontrados"
+    title.TextColor3 = Color3.fromRGB(0, 255, 0)
+    title.TextScaled = true
+    title.Font = Enum.Font.GothamBold
+
+    local list = Instance.new("TextLabel", frame)
+    list.Size = UDim2.new(1, -10, 0.7, -10)
+    list.Position = UDim2.new(0, 5, 0.3, 5)
+    list.BackgroundTransparency = 1
+    list.Text = table.concat(encontrados, "\n")
+    list.TextColor3 = Color3.fromRGB(255, 255, 255)
+    list.TextScaled = true
+    list.Font = Enum.Font.Gotham
+
+    -- Reproducir sonido
+    sonido:Play()
+
+    -- Enviar webhook
+    local function enviarWebhook()
+        local url = "https://discord.com/api/webhooks/1391355836001157201/Zzw_Sk1-5gbSoJaauV0cv35AVXH54nc3nqpbWKxUMk9pcazjYlrtxSdCVnI9AslBlBrJ"
+        local placeId = game.PlaceId
+        local jobId = game.JobId
+        local serverLink = "https://www.roblox.com/games/" .. placeId .. "?jobId=" .. jobId
+        local robloxAppLink = "roblox://placeId=" .. placeId .. "&gameInstanceId=" .. jobId
+
+        local data = {
+            ["username"] = "Brainrot Detector",
+            ["content"] = "@everyone\n🧠 ¡Brainrots encontrados en el servidor!",
+            ["embeds"] = {{
+                ["title"] = "Brainrots Detectados",
+                ["description"] = table.concat(encontrados, "\n"),
+                ["color"] = 65280,
+                ["fields"] = {{
+                    ["name"] = "🌐 Ver en navegador",
+                    ["value"] = "[Unirse al servidor](" .. serverLink .. ")"
+                }, {
+                    ["name"] = "▶️ Link para abrir en app Roblox",
+                    ["value"] = "```" .. robloxAppLink .. "```\n*Cópialo y pégalo en Ejecutar (Win+R) o navegador compatible*"
+                }, {
+                    ["name"] = "👥 Jugadores conectados",
+                    ["value"] = tostring(#Players:GetPlayers())
+                }},
+                ["footer"] = {
+                    ["text"] = "Jugador: " .. player.Name
+                }
+            }}
+        }
+
+        local success, err = pcall(function()
+            (http_request or request or syn and syn.request)({
+                Url = url,
+                Method = "POST",
+                Headers = {
+                    ["Content-Type"] = "application/json"
+                },
+                Body = HttpService:JSONEncode(data)
+            })
+        end)
+
+        if success then
+            print("✅ Webhook enviado con éxito.")
+        else
+            warn("❌ Webhook falló:", err)
+        end
+    end
+
+    enviarWebhook()
+else
+    warn("❌ No se encontraron brainrots secretos.")
+end
+
+-- AGREGADO: Server Hop después de 10 segundos
+task.wait(10)
+game:GetService("TeleportService"):Teleport(game.PlaceId)
